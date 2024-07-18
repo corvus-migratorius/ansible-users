@@ -1,0 +1,21 @@
+---
+users:
+  - name: "user1"
+    uid: 1001
+    gid: 1004
+    full_name: "user11"
+    state: "present"
+    groups: [sudo]
+    create_home: true
+    shell: "/bin/bash"
+    pubkeys_file: "user1.keys"
+
+  - name: "user2"
+    uid: 1002
+    gid: 1005
+    full_name: "user21"
+    state: "present"
+    groups: [sudo]
+    create_home: true
+    shell: "/bin/bash"
+    pubkeys_file: "user2.keys"

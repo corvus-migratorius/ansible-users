@@ -2,4 +2,7 @@
 - name: Converge
   hosts: all
   roles:
-    - role: genlab.template
+    - role: genlab.users
+      definitions: "users.yaml"
+      default_password: "def_pw.txt"
+

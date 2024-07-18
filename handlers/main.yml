@@ -1,1 +1,9 @@
 ---
+# handlers file for user
+
+# - name: "Change user password upon creation"
+#   loop: "{{ useradd.results }}"
+#   when: item.changed
+#   listen: "force password change"
+#   ansible.builtin.command:
+#     cmd: "passwd -e {{ item.name }}"

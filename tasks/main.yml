@@ -1,4 +1,65 @@
 ---
-- name: "Mock task"
-  ansible.builtin.debug:
-    msg: "hello, world!"
+# tasks file for users
+- name: "Include user definition vars"
+  ansible.builtin.include_vars:
+    file: "{{ definitions }}"
+
+- name: "Fail if the default password is undefined"
+  ansible.builtin.fail:
+    msg: "Default user password ('default_password') is undefined"
+  when: "default_password is undefined"
+
+- name: "Configure user groups"
+  ansible.builtin.group:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    gid: "{{ item.gid }}"
+  with_items:
+    - "{{ users }}"
+
+- name: "Configure user accounts"
+  loop: "{{ users }}"
+  notify: "force password change"
+  register: "useradd"
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    comment: "{{ item.full_name }}"
+    uid: "{{ item.uid }}"
+    state: "{{ item.state }}"
+    groups: "{{ item.groups }}"
+    group: "{{ item.name }}"
+    append: false
+    create_home: "{{ item.create_home }}"
+    shell: "{{ item.shell }}"
+    generate_ssh_key: false
+    password: "{{ default_password.password | password_hash('sha512', default_password.salt) }}"
+    update_password: "on_create"
+
+- name: "Extend the PATH variable with '/usr/local/bin' (RHEL)"
+  ansible.builtin.blockinfile:
+    path: "/home/{{ item.name }}/.bash_profile"
+    block: |
+      PATH="$PATH:/usr/local/bin"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (PATH)"
+  with_items:
+    - "{{ users }}"
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: "Extend the PATH variable with '/usr/local/bin' (Debian)"
+  ansible.builtin.blockinfile:
+    path: "/home/{{ item.name }}/.profile"
+    block: |
+      PATH="$PATH:/usr/local/bin"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (PATH)"
+  with_items:
+    - "{{ users }}"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: "Deploy SSH public keys to 'authorized_keys' files"
+  ansible.posix.authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ lookup('file', item.pubkeys_file) }}"
+    key_options: "{{ item.options | default('') }}"
+    exclusive: true
+  with_items:
+    - "{{ users }}"
