@@ -2,7 +2,7 @@
 # tasks file for users
 - name: "Include user definition vars"
   ansible.builtin.include_vars:
-    file: "{{ definitions }}"
+    file: "{{ manifest_path }}"
 
 - name: "Read default password and salt"
   ansible.builtin.include_vars:
@@ -33,7 +33,7 @@
     password: "{{ def_pw | password_hash('sha512', salt) }}"
     update_password: "on_create"
 
-- name: "Configure user accounts"
+- name: "Configure user accounts"  # separate task so that the `passwd -e` handler doesn't trigger
   loop: "{{ users }}"
   ansible.builtin.user:
     name: "{{ item.name }}"

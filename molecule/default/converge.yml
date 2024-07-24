@@ -4,5 +4,5 @@
 
   roles:
     - role: genlab.users
-      definitions: "users.yaml"
+      manifest_path: "users.yml"
       def_pw_path: "def_pw.yml"
