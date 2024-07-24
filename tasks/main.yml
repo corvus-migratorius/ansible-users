@@ -43,6 +43,7 @@
     groups: "{{ item.groups }}"
     group: "{{ item.name }}"
     append: false
+    password_lock: "{{ item.password_lock | default('false') }}"
 
 - name: "Deploy SSH public keys to 'authorized_keys' files"
   loop: "{{ users }}"

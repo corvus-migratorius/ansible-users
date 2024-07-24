@@ -19,3 +19,4 @@ users:
     create_home: true
     shell: "/bin/sh"
     pubkeys_file: "user1.keys"
+    password_lock: true
