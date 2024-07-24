@@ -51,24 +51,3 @@
     key: "{{ lookup('file', item.pubkeys_file) }}"
     key_options: "{{ item.options | default('') }}"
     exclusive: true
-
-
-
-# - name: "Extend the PATH variable with '/usr/local/bin' (RHEL)"
-#   ansible.builtin.blockinfile:
-#     path: "/home/{{ item.name }}/.bash_profile"
-#     block: PATH="$PATH:/usr/local/bin"
-#     marker: "# {mark} ANSIBLE MANAGED BLOCK (PATH)"
-#   with_items:
-#     - "{{ users }}"
-#   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-
-# - name: "Extend the PATH variable with '/usr/local/bin' (Debian)"
-#   ansible.builtin.blockinfile:
-#     path: "/home/{{ item.name }}/.profile"
-#     block: |
-#       PATH="$PATH:/usr/local/bin"
-#     marker: "# {mark} ANSIBLE MANAGED BLOCK (PATH)"
-#   with_items:
-#     - "{{ users }}"
-#   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
