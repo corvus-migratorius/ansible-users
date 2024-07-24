@@ -23,7 +23,7 @@
         var: passwd.stdout_lines
 
     - debug:
-        var: shadow.stdout_lines == expected_shadow
+        var: shadow.stdout_lines
 
     - name: "Verify expected account configuration"
       vars:
