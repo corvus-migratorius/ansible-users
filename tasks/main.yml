@@ -45,6 +45,22 @@
     append: false
     password_lock: "{{ item.password_lock | default('false') }}"
 
+- name: "Set user account expiration date where defined"
+  loop: "{{ users }}"
+  when: item.expires is defined
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    expires: "{{ (item.expires | to_datetime).strftime('%s') }}"
+
+- name: "Ensure no user account expiration date where undefined"
+  loop: "{{ users }}"
+  when: item.expires is undefined
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    expires: "-1"
+
 - name: "Deploy SSH public keys to 'authorized_keys' files"
   loop: "{{ users }}"
   ansible.posix.authorized_key:

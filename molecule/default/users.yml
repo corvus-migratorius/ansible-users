@@ -20,3 +20,4 @@ users:
     shell: "/bin/sh"
     pubkeys_file: "user1.keys"
     password_lock: true
+    expires: "2024-07-23 00:00:00"
