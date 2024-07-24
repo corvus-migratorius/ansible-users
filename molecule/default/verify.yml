@@ -20,10 +20,10 @@
         executable: /bin/bash
 
     - debug:
-        vars: passwd.stdout_lines
+        var: passwd.stdout_lines
 
     - debug:
-        vars: shadow.stdout_lines == expected_shadow
+        var: shadow.stdout_lines == expected_shadow
 
     - name: "Verify expected account configuration"
       vars:
