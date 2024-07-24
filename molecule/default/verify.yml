@@ -19,6 +19,12 @@
         cmd: set -o pipefail; cat /etc/shadow | grep user
         executable: /bin/bash
 
+    - debug:
+        vars: passwd.stdout_lines
+
+    - debug:
+        vars: shadow.stdout_lines == expected_shadow
+
     - name: "Verify expected account configuration"
       vars:
         expected_shadow:
