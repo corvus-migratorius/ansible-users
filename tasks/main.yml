@@ -4,62 +4,71 @@
   ansible.builtin.include_vars:
     file: "{{ definitions }}"
 
-- name: "Fail if the default password is undefined"
-  ansible.builtin.fail:
-    msg: "Default user password ('default_password') is undefined"
-  when: "default_password is undefined"
+- name: "Read default password and salt"
+  ansible.builtin.include_vars:
+    file: "{{ def_pw_path }}"
 
-- name: "Configure user groups"
+- name: "Fail if the default password is undefined"
+  when: "def_pw is undefined"
+  ansible.builtin.fail:
+    msg: "No default user password defined"
+
+- name: "Create user groups"  # in case UID != GID
+  loop: "{{ users }}"
   ansible.builtin.group:
     name: "{{ item.name }}"
-    state: "{{ item.state }}"
     gid: "{{ item.gid }}"
-  with_items:
-    - "{{ users }}"
+    state: "{{ item.state }}"
+
+- name: "Create user accounts"
+  loop: "{{ users }}"
+  register: useradd
+  notify: "Force password change"
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    uid: "{{ item.uid }}"
+    create_home: "{{ item.create_home }}"
+    generate_ssh_key: false
+    password: "{{ def_pw | password_hash('sha512', salt) }}"
+    update_password: "on_create"
 
 - name: "Configure user accounts"
   loop: "{{ users }}"
-  notify: "force password change"
-  register: "useradd"
   ansible.builtin.user:
     name: "{{ item.name }}"
-    comment: "{{ item.full_name }}"
-    uid: "{{ item.uid }}"
     state: "{{ item.state }}"
+    comment: "{{ item.full_name }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
     groups: "{{ item.groups }}"
     group: "{{ item.name }}"
     append: false
-    create_home: "{{ item.create_home }}"
-    shell: "{{ item.shell }}"
-    generate_ssh_key: false
-    password: "{{ default_password.password | password_hash('sha512', default_password.salt) }}"
-    update_password: "on_create"
-
-- name: "Extend the PATH variable with '/usr/local/bin' (RHEL)"
-  ansible.builtin.blockinfile:
-    path: "/home/{{ item.name }}/.bash_profile"
-    block: |
-      PATH="$PATH:/usr/local/bin"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK (PATH)"
-  with_items:
-    - "{{ users }}"
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-
-- name: "Extend the PATH variable with '/usr/local/bin' (Debian)"
-  ansible.builtin.blockinfile:
-    path: "/home/{{ item.name }}/.profile"
-    block: |
-      PATH="$PATH:/usr/local/bin"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK (PATH)"
-  with_items:
-    - "{{ users }}"
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: "Deploy SSH public keys to 'authorized_keys' files"
+  loop: "{{ users }}"
   ansible.posix.authorized_key:
     user: "{{ item.name }}"
     key: "{{ lookup('file', item.pubkeys_file) }}"
     key_options: "{{ item.options | default('') }}"
     exclusive: true
-  with_items:
-    - "{{ users }}"
+
+
+
+# - name: "Extend the PATH variable with '/usr/local/bin' (RHEL)"
+#   ansible.builtin.blockinfile:
+#     path: "/home/{{ item.name }}/.bash_profile"
+#     block: PATH="$PATH:/usr/local/bin"
+#     marker: "# {mark} ANSIBLE MANAGED BLOCK (PATH)"
+#   with_items:
+#     - "{{ users }}"
+#   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+# - name: "Extend the PATH variable with '/usr/local/bin' (Debian)"
+#   ansible.builtin.blockinfile:
+#     path: "/home/{{ item.name }}/.profile"
+#     block: |
+#       PATH="$PATH:/usr/local/bin"
+#     marker: "# {mark} ANSIBLE MANAGED BLOCK (PATH)"
+#   with_items:
+#     - "{{ users }}"
+#   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

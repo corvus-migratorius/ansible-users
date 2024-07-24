@@ -2,19 +2,7 @@
 - name: Converge
   hosts: all
 
-  pre_tasks:
-    - name: Ensure pip is installed
-      ansible.builtin.package:
-        name: python3-pip
-        state: present
-
-    - name: Install passlib using pip
-      ansible.builtin.pip:
-        name: passlib
-        executable: pip
-
   roles:
     - role: genlab.users
       definitions: "users.yaml"
-      default_password: "def_pw.txt"
-
+      def_pw_path: "def_pw.yml"
