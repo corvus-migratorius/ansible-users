@@ -1,6 +1,7 @@
 ---
 # tasks file for users
 - name: "Include user definition vars"
+  when: (manifest_path is defined) and (manifest_path != "") and users is not defined
   ansible.builtin.include_vars:
     file: "{{ manifest_path }}"
 
