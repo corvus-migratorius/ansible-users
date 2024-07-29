@@ -6,14 +6,14 @@
 
   tasks:
     - name: "Get user info from /etc/passwd"
-      register: passwd
+      register: etc_passwd
       changed_when: false
       ansible.builtin.shell:
         cmd: set -o pipefail; cat /etc/passwd | grep user
         executable: /bin/bash
 
     - name: "Get user info from /etc/shadow"
-      register: shadow
+      register: etc_shadow
       changed_when: false
       ansible.builtin.shell:
         cmd: set -o pipefail; cat /etc/shadow | grep user
@@ -29,5 +29,5 @@
           - "user1:x:1002:1002:User One:/home/user1:/bin/sh"
       ansible.builtin.assert:
         that:
-          - passwd.stdout_lines == expected_passwd
-          - shadow.stdout_lines == expected_shadow
+          - etc_passwd.stdout_lines == expected_passwd
+          - etc_shadow.stdout_lines == expected_shadow
