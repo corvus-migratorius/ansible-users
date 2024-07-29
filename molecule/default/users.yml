@@ -17,6 +17,5 @@ users:
     groups: []
     create_home: true
     shell: "/bin/sh"
-    pubkeys_file: "user1.keys"
     password_lock: true
     expires: "2024-07-23 12:00:00"
