@@ -28,7 +28,7 @@
     name: "{{ item.name }}"
     state: "{{ item.state }}"
     uid: "{{ item.uid }}"
-    create_home: "{{ item.create_home }}"
+    create_home: "{{ item.create_home | default(true) }}"
     generate_ssh_key: false
     password: "{{ def_pw | password_hash('sha512', salt) }}"
     update_password: "on_create"
@@ -40,7 +40,7 @@
     state: "{{ item.state }}"
     comment: "{{ item.full_name }}"
     shell: "{{ item.shell | default('/bin/bash') }}"
-    groups: "{{ item.groups }}"
+    groups: "{{ item.groups | default([]) }}"
     group: "{{ item.name }}"
     append: false
     password_lock: "{{ item.password_lock | default('false') }}"
