@@ -12,7 +12,6 @@ users:
 
   - name: "user1"
     uid: 1002
-    gid: 1005
     full_name: "User One"
     state: "present"
     groups: []
