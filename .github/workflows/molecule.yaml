@@ -22,13 +22,12 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.
-        uses: actions/setup-python@v5
+      - uses: mamba-org/setup-micromamba@v1
         with:
-          python-version: '3.x'
-
-      - name: Install test dependencies.
-        run: pip3 install -r requirements.ci.txt
+          micromamba-version: '1.5.8-0'
+          environment-file: environment.yml
+          init-shell: bash
+          post-cleanup: 'all'
 
       - name: Run Molecule tests.
         run: molecule test
@@ -36,3 +35,4 @@ jobs:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+        shell: micromamba-shell {0}

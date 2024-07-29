@@ -1,4 +1,70 @@
 ---
-- name: "Mock task"
-  ansible.builtin.debug:
-    msg: "hello, world!"
+# tasks file for users
+- name: "Include user definition vars"
+  ansible.builtin.include_vars:
+    file: "{{ manifest_path }}"
+
+- name: "Read default password and salt"
+  ansible.builtin.include_vars:
+    file: "{{ def_pw_path }}"
+
+- name: "Fail if the default password is undefined"
+  when: "def_pw is undefined"
+  ansible.builtin.fail:
+    msg: "No default user password defined"
+
+- name: "Create user groups"  # in case UID != GID
+  loop: "{{ users }}"
+  ansible.builtin.group:
+    name: "{{ item.name }}"
+    gid: "{{ item.gid }}"
+    state: "{{ item.state }}"
+
+- name: "Create user accounts"
+  loop: "{{ users }}"
+  register: useradd
+  notify: "Force password change"
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    uid: "{{ item.uid }}"
+    create_home: "{{ item.create_home }}"
+    generate_ssh_key: false
+    password: "{{ def_pw | password_hash('sha512', salt) }}"
+    update_password: "on_create"
+
+- name: "Configure user accounts"  # separate task so that the `passwd -e` handler doesn't trigger
+  loop: "{{ users }}"
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    comment: "{{ item.full_name }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    groups: "{{ item.groups }}"
+    group: "{{ item.name }}"
+    append: false
+    password_lock: "{{ item.password_lock | default('false') }}"
+
+- name: "Set user account expiration date where defined"
+  loop: "{{ users }}"
+  when: item.expires is defined
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    expires: "{{ (item.expires | to_datetime).strftime('%s') }}"
+
+- name: "Ensure no user account expiration date where undefined"
+  loop: "{{ users }}"
+  when: item.expires is undefined
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    expires: "-1"
+
+- name: "Deploy SSH public keys to 'authorized_keys' files"
+  loop: "{{ users }}"
+  ansible.posix.authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ lookup('file', item.pubkeys_file) }}"
+    key_options: "{{ item.options | default('') }}"
+    exclusive: true

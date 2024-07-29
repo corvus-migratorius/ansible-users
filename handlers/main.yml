@@ -1,1 +1,8 @@
 ---
+# handlers file for user
+
+- name: "Force password change" # noqa no-changed-when
+  loop: "{{ useradd.results }}"
+  when: item.changed
+  ansible.builtin.command:
+    cmd: "passwd -e {{ item.name }}"

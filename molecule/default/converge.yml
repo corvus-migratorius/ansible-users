@@ -1,5 +1,8 @@
 ---
 - name: Converge
   hosts: all
+
   roles:
-    - role: genlab.template
+    - role: genlab.users
+      manifest_path: "users.yml"
+      def_pw_path: "def_pw.yml"
