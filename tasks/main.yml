@@ -63,6 +63,7 @@
 
 - name: "Deploy SSH public keys to 'authorized_keys' files"
   loop: "{{ users }}"
+  when: (item.pubkeys_file is defined) and (item.pubkeys_file != "")
   ansible.posix.authorized_key:
     user: "{{ item.name }}"
     key: "{{ lookup('file', item.pubkeys_file) }}"
