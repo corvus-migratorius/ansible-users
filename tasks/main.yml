@@ -15,6 +15,7 @@
 
 - name: "Create user groups"  # in case UID != GID
   loop: "{{ users }}"
+  when: item.gid is defined
   ansible.builtin.group:
     name: "{{ item.name }}"
     gid: "{{ item.gid }}"
