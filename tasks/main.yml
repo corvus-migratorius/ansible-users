@@ -85,6 +85,7 @@
   loop: "{{ users }}"
   when: item.uid is defined
   register: limit_state
+  notify: "Restart user services"
   ansible.builtin.template:
     src: slice.j2
     dest: "/etc/systemd/system/user-{{ item.uid }}.slice.d/50-limits.conf"
