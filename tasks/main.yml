@@ -86,7 +86,7 @@
   # cpu_quota is like "100%" for 1 full cpu.
 
 - name: "Remember which user sservices need to restart"
-  set_fact:
+  ansible.builtin.set_fact:
     restart_services: "{{ restart_services | default([]) + [item.item.name] }}"
   when: item.changed
   with_items: "{{ limit_changes.results }}"
