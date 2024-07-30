@@ -77,6 +77,9 @@
   ansible.builtin.file:
     path: /etc/systemd/system/user-{{ item.uid }}.slice.d
     state: directory
+    owner: root
+    group: root
+    mode: '0750'
 
 - name: "Create/update systemd slice limit configs"
   loop: "{{ users }}"
@@ -86,7 +89,7 @@
     dest: /etc/systemd/system/user-{{ item.uid }}.slice.d/50-limits.conf
     owner: root
     group: root
-    mode: '0755'
+    mode: '0750'
   register: limit_state
   # Also needs users.memory_max and users.cpu_quota. memory_max may use postfix like K, M, G.
   # cpu_quota is like "100%" for 1 full cpu.
