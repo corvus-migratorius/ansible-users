@@ -81,6 +81,20 @@
     owner: root
     group: root
     mode: '0755'
+  register: limit_changes
   # Also needs users.memory_max and users.cpu_quota. memory_max may use postfix like K, M, G.
   # cpu_quota is like "100%" for 1 full cpu.
 
+- name: "Remember which user sservices need to restart"
+  set_fact:
+    restart_services: "{{ restart_services | default([]) + [item.item.name] }}"
+  when: item.changed
+  with_items: "{{ limit_changes.results }}"
+
+- name: "Restart user services"
+  when: item.name in restart_services | default([])
+  ansible.builtin.systemd_service:
+    state: restarted
+    daemon_reload: true
+    name: user@{{ item.uid }}
+  with_items: "{{ users }}"
