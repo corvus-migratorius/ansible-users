@@ -75,7 +75,7 @@
 - name: "Create systemd slice directories"
   loop: "{{ users }}"
   ansible.builtin.file:
-    path: /etc/systemd/user-{{ item.uid }}.slice.d
+    path: /etc/systemd/system/user-{{ item.uid }}.slice.d
     state: directory
 
 - name: "Create/update systemd slice limit configs"
