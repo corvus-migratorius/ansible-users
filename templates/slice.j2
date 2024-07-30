@@ -1,9 +1,9 @@
 [Slice]
-{% if item.memory_max %}
+{% if item.memory_max is defined %}
 MemoryMax={{ item.memory_max }}
 {% else %}
 {% endif %}
-{% if item.cpu_quota %}
+{% if item.cpu_quota is defined %}
 CPUQuota={{ item.cpu_quota }}
 {% else %}
 {% endif %}
