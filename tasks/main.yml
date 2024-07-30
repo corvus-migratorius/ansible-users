@@ -72,6 +72,12 @@
     key_options: "{{ item.options | default('') }}"
     exclusive: true
 
+- name: "Create systemd slice directories"
+  loop: "{{ users }}"
+  ansible.builtin.file:
+    path: /etc/systemd/user-{{ item.uid }}.slice.d
+    state: directory
+
 - name: "Create/update systemd slice limit configs"
   loop: "{{ users }}"
   when: (item.gid is defined) # and (users_systemd_limits is true)
@@ -81,20 +87,6 @@
     owner: root
     group: root
     mode: '0755'
-  register: limit_changes
+  register: limit_state
   # Also needs users.memory_max and users.cpu_quota. memory_max may use postfix like K, M, G.
   # cpu_quota is like "100%" for 1 full cpu.
-
-- name: "Remember which user sservices need to restart"
-  ansible.builtin.set_fact:
-    restart_services: "{{ restart_services | default([]) + [item.item.name] }}"
-  when: item.changed
-  with_items: "{{ limit_changes.results }}"
-
-- name: "Restart user services"
-  when: item.name in restart_services | default([])
-  ansible.builtin.systemd_service:
-    state: restarted
-    daemon_reload: true
-    name: user@{{ item.uid }}
-  with_items: "{{ users }}"
