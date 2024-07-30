@@ -1,0 +1,11 @@
+[Slice]
+{% if item.memory_max %}
+MemoryMax={{ item.memory_max }}
+{% else %}
+{% endif %}
+{% if item.cpu_quota %}
+CPUQuota={{ item.cpu_quota }}
+{% else %}
+{% endif %}
+
+
