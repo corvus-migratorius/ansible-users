@@ -83,13 +83,13 @@
 
 - name: "Create/update systemd slice limit configs"
   loop: "{{ users }}"
-  when: (item.uid is defined) # and (users_systemd_limits is true)
-  ansible.builtin.template:   # it's commented becouse if limits need to be disabled
-    src: slice.j2             # you still need to delete configs, so now it just creates empty
-    dest: /etc/systemd/system/user-{{ item.uid }}.slice.d/50-limits.conf
+  when: item.uid is defined
+  register: limit_state
+  ansible.builtin.template:
+    src: slice.j2
+    dest: "/etc/systemd/system/user-{{ item.uid }}.slice.d/50-limits.conf"
     owner: root
     group: root
     mode: '0750'
-  register: limit_state
   # Also needs users.memory_max and users.cpu_quota. memory_max may use postfix like K, M, G.
   # cpu_quota is like "100%" for 1 full cpu.
