@@ -93,6 +93,9 @@
   when: item.uid is defined
   register: limit_state
   notify: "Restart user services"
+  vars:
+    memory_max: "{{ (item.memory_max is defined and item.memory_max != '') | ternary(item.memory_max, common_memory_max) | default('') }}"
+    cpu_quota: "{{ (item.cpu_quota is defined and item.cpu_quota != '') | ternary(item.cpu_quota, common_cpu_quota) | default('') }}"
   ansible.builtin.template:
     src: slice.j2
     dest: "/etc/systemd/system/user-{{ item.uid }}.slice.d/50-limits.conf"

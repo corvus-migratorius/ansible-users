@@ -6,3 +6,5 @@
     - role: genlab.users
       manifest_path: "users.yml"
       def_pw_path: "def_pw.yml"
+      common_memory_max: "500M"
+      common_cpu_quota: "100%"
