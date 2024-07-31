@@ -26,11 +26,14 @@
   loop: "{{ users }}"
   register: useradd
   notify: "Force password change"
+  vars:
+    home_root: "{{ item.home_root is defined | ternary(item.home_root, default_home_root) }}"
   ansible.builtin.user:
     name: "{{ item.name }}"
     state: "{{ item.state }}"
     uid: "{{ item.uid }}"
     create_home: "{{ item.create_home | default(true) }}"
+    home: "{{ home_root }}/{{ item.name }}"
     generate_ssh_key: false
     password: "{{ def_pw | password_hash('sha512', salt) }}"
     update_password: "on_create"
