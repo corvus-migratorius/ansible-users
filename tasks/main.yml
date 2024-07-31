@@ -81,6 +81,13 @@
     group: root
     mode: '0750'
 
+# Set user's maximum memory limit to 'memory_limit' defined in the user manifest_path.
+# If 'memory_limit' is undefined there, use 'common_memory_max' as fallback.
+# If 'common_memory_max' is also undefined, set to "", which should be ignored by the template.
+# - 'memory_max:' may use postfix like K, M, G.
+# - 'cpu_quota':  "100%" for 1 full core.
+# REF https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html
+# REF https://serverfault.com/a/1092803
 - name: "Create/update systemd slice limit configs"
   loop: "{{ users }}"
   when: item.uid is defined
@@ -92,5 +99,3 @@
     owner: root
     group: root
     mode: '0750'
-  # Also needs users.memory_max and users.cpu_quota. memory_max may use postfix like K, M, G.
-  # cpu_quota is like "100%" for 1 full cpu.
