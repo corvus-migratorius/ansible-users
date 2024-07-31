@@ -1,5 +1,26 @@
 ---
-# handlers file for user
+- name: "Enable user services"
+  loop: "{{ limit_state.results }}"
+  when: item.changed
+  ansible.builtin.systemd_service:
+    name: user@{{ item.item.uid }}.service
+    enabled: true
+
+# User service cannot be restarted if:
+# - the account is expired (we check for that)
+# - password changed was enforced (firs)
+# Sometimes restarting fails with obscure 'status=219/CGROUP', but works fine after a retry
+# Didn't debug this yet, sorry ;(
+- name: "Restart user services (systemd limits)"
+  loop: "{{ limit_state.results }}"
+  when:
+    - item.changed
+    - item.item.expires is undefined or (item.item.expires | to_datetime).strftime('%s') > now(fmt='%s')
+  retries: 2
+  ansible.builtin.systemd_service:
+    name: user@{{ item.item.uid }}.service
+    state: restarted
+    daemon_reload: true
 
 - name: "Force password change" # noqa no-changed-when
   loop: "{{ useradd.results }}"
