@@ -7,6 +7,7 @@ users:
     state: "present"
     groups: [sudo]
     create_home: true
+    home_root: "/tmp/someplace"
     shell: "/bin/bash"
     pubkeys_file: "user0.keys"
 
