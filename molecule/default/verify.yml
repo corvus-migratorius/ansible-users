@@ -31,3 +31,23 @@
         that:
           - etc_passwd.stdout_lines == expected_passwd
           - etc_shadow.stdout_lines == expected_shadow
+
+    - name: "Get the user slice drop-in for user0"
+      register: user0_slice_dropin
+      changed_when: false
+      ansible.builtin.command:
+        cmd: cat /etc/systemd/system/user-1001.slice.d/50-limits.conf
+
+    - name: "Verify drop-in contens"
+      vars:
+        expected:
+          - "[Slice]"
+          - "MemoryAccounting=1"
+          - "MemoryMax=500M"
+          - "MemorySwapMax=2G"
+          - "CPUAccounting=1"
+          - "CPUQuota=100%"
+      ansible.builtin.assert:
+        that: "user0_slice_dropin.stdout_lines == expected"
+        success_msg: "Got the expected limits slice drop-in"
+        fail_msg: "Unexpected limits slice drop-in contents"
