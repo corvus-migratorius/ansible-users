@@ -100,6 +100,7 @@
     - "Restart user services (systemd limits)"
   vars:
     memory_max: "{{ (item.memory_max is defined and item.memory_max != '') | ternary(item.memory_max, common_memory_max) | default('') }}"
+    swap_max: "{{ (item.swap_max is defined and item.swap_max != '') | ternary(item.swap_max, common_swap_max) | default('') }}"
     cpu_quota: "{{ (item.cpu_quota is defined and item.cpu_quota != '') | ternary(item.cpu_quota, common_cpu_quota) | default('') }}"
   ansible.builtin.template:
     src: slice.j2
@@ -107,3 +108,6 @@
     owner: root
     group: root
     mode: '0750'
+
+- name: "Flush handlers"
+  ansible.builtin.meta: "flush_handlers"
