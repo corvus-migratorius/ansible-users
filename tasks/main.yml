@@ -108,3 +108,6 @@
     owner: root
     group: root
     mode: '0750'
+
+- name: "Flush handlers"
+  ansible.builtin.meta: "flush_handlers"
