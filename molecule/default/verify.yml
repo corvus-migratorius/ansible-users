@@ -1,7 +1,7 @@
 ---
 - name: Verify
   hosts: all
-  gather_facts: false
+  gather_facts: true
   any_errors_fatal: true
 
   tasks:
@@ -31,6 +31,16 @@
         that:
           - etc_passwd.stdout_lines == expected_passwd
           - etc_shadow.stdout_lines == expected_shadow
+
+    - name: "Get SSH key contents for user1"
+      register: user1_ssh_key
+      changed_when: false
+      ansible.builtin.command:
+        cmd: cat /home/user1/.ssh/id_ed25519.pub
+
+    - name: "Verify the SSH key contents for user1"
+      ansible.builtin.assert:
+        that: "'user1@ubuntu' in user1_ssh_key.stdout"
 
     - name: "Get the user slice drop-in for user0"
       register: user0_slice_dropin
