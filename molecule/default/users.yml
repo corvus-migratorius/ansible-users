@@ -20,3 +20,4 @@ users:
     shell: "/bin/sh"
     password_lock: true
     expires: "2024-07-23 12:00:00"
+    generate_ssh_key: true

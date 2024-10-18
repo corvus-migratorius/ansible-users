@@ -1,5 +1,10 @@
 ---
-# tasks file for users
+- name: "Ensure openssh client tools are installed"
+  ansible.builtin.apt:
+    name: [ openssh-client ]
+    state: present
+    cache_valid_time: 3000
+
 - name: "Include user definition vars"
   when: (manifest_path is defined) and (manifest_path != "") and users is not defined
   ansible.builtin.include_vars:
@@ -34,7 +39,9 @@
     uid: "{{ item.uid }}"
     create_home: "{{ item.create_home | default(true) }}"
     home: "{{ home_root }}/{{ item.name }}"
-    generate_ssh_key: false
+    generate_ssh_key: "{{ item.generate_ssh_key | default(false) }}"
+    ssh_key_type: "{{ item.ssh_key_type | default('ed25519') }}"
+    ssh_key_comment: "{{ item.name }}@{{ ansible_nodename }}"
     password: "{{ def_pw | password_hash('sha512', salt) }}"
     update_password: "on_create"
 
