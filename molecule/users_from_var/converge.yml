@@ -4,8 +4,10 @@
 
   roles:
     - role: genlab.users
-      def_pw_path: "def_pw.yml"
       manifest_path: "some-none-existent-file"  # 'users' is supposed to take precedence
+      common_memory_max: "500M"
+      common_swap_max: "2G"
+      common_cpu_quota: "100%"
       users:
         - name: "user0"
           uid: 1001
@@ -14,6 +16,7 @@
           state: "present"
           groups: [sudo]
           create_home: true
+          home_root: "/tmp/someplace"
           shell: "/bin/bash"
           pubkeys_file: "user0.keys"
 
@@ -24,5 +27,5 @@
           groups: []
           create_home: true
           shell: "/bin/sh"
-          password_lock: true
           expires: "2024-07-23 12:00:00"
+          generate_ssh_key: true

@@ -19,11 +19,12 @@
         cmd: set -o pipefail; cat /etc/shadow | grep user
         executable: /bin/bash
 
+    # using a hack since here the date of last password change == date of account creation
     - name: "Verify expected account configuration"
       vars:
         expected_shadow:
-          - "user0:$6$rounds=656000$himalayan$76YpfjVvtTktDi6nbIyVtCSkcX8V7Dz7KGOPkgCx/atCOQxTJL210hRWciLUyyzTpU0L9.MF6nlNB0SQR/hY5.:0:0:99999:7:::"
-          - "user1:!$6$rounds=656000$himalayan$76YpfjVvtTktDi6nbIyVtCSkcX8V7Dz7KGOPkgCx/atCOQxTJL210hRWciLUyyzTpU0L9.MF6nlNB0SQR/hY5.:0:0:99999:7::19927:"
+          - "user0:!:{{ (ansible_date_time.epoch | int) // 86400 }}:0:99999:7:::"
+          - "user1:!:{{ (ansible_date_time.epoch | int) // 86400 }}:0:99999:7::19927:"
         expected_passwd:
           - "user0:x:1001:1004:User Zero:/tmp/someplace/user0:/bin/bash"
           - "user1:x:1002:1002:User One:/home/user1:/bin/sh"
