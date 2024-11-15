@@ -8,7 +8,7 @@
 
 - name: "Create user group ('{{ user.name }}')"  # to handle cases where GID!=UID
   when:
-    - getent_groups[username] is not defined
+    - getent_group[user.name] is not defined
   ansible.builtin.group:
     name: "{{ user.name }}"
     gid: "{{ user.gid is defined | ternary(user.gid, user.uid) }}"
