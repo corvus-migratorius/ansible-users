@@ -1,4 +1,4 @@
-Role Name
+ansible-users
 =========
 
 Create user accounts according to a YAML manifest.
@@ -10,17 +10,29 @@ Controls:
   - GECOS field (typically full user name)
   - shell
   - SSH public key deployment to `.ssh/authorized_keys`
+  - account expiration
+  - memory, swap and CPU allocation limits via user slices
 
-Sets a default password and enforces password change on the first login.
+Check out [corvus-migratorius/ansible-disk-quotas](https://github.com/corvus-migratorius/ansible-disk-quotas) for controlling non-root filesystem quotas.
 
 Requirements
 ------------
 
+- systemd
+- openssh
+
 Role Variables
 --------------
 
-`manifest_path`: YAML file containing user definitions (see `molecule/default/users.yml`)
-`def_pw_path`: YAML file containing default user password and salt (see `molecule/default/def_pw.yml`)
+`manifest_path`: a YAML file containing user definitions (see `molecule/default/users.yml` for an example)
+
+`users`: a list of objects mirroring the YAML structure expected by `manifest_path`; takes precedence over it
+
+`common_memory_max`: e.g. `"500M"`, optional
+
+`common_swap_max`: e.g. `"2G"`, optional
+
+`common_cpu_quota`: e.g. `"100%"`, optional
 
 Dependencies
 ------------
