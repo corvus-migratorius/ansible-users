@@ -1,15 +1,14 @@
 ---
 - name: "Get current user's group entity info ({{ user.name }})"
-  failed-when: false
+  failed_when: false
   ansible.builtin.getent:
     database: group
     key: "{{ user.name }}"
     split: ":"
 
-- name: "Create user group ('{{ user.name }}')"
+- name: "Create user group ('{{ user.name }}')"  # to handle cases where GID!=UID
   when:
-    - user.uid != user.gid
-    - getent_groups[username] is defined
+    - getent_groups[username] is not defined
   ansible.builtin.group:
     name: "{{ user.name }}"
     gid: "{{ user.gid is defined | ternary(user.gid, user.uid) }}"
