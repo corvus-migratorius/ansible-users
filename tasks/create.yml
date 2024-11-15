@@ -1,5 +1,6 @@
 ---
 - name: "Get current user's group entity info ({{ user.name }})"
+  failed-when: false
   ansible.builtin.getent:
     database: group
     key: "{{ user.name }}"
