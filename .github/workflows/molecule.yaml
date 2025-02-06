@@ -23,9 +23,9 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v4
 
-      - uses: mamba-org/setup-micromamba@v2
+      - uses: mamba-org/setup-micromamba@0dea6379afdaffa5d528b3d1dabc45da37f443fc
         with:
-          micromamba-version: '1.5.8-0'
+          micromamba-version: '2.0.5-0'
           environment-file: environment.yml
           init-shell: bash
           post-cleanup: 'all'
